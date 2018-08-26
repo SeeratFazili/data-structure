@@ -1,74 +1,92 @@
-//DFS for Undirected Graph
-
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-#include <set>
-#include<queue>
-#include<sstream>
-#include<fstream>
+#include<iostream>
 using namespace std;
-class Graphs{
-private:
-  unordered_map<int,vector<int> > Graph;
-  vector<int> magicOdering;
-  set<int>visited;
-  queue<int> Q;
-  void Push_value(int scr , int des){
-              if(Graph.find(scr) == Graph.end()){
-                 vector<int> Temp1;
-                 Temp1.push_back(des);
-                 Graph[scr] = Temp1;
-             }
-             else{
-                  vector<int>& X = Graph[scr];
-                  X.push_back(des);
-              }
-          }
+class list{
 public:
-  void ReadFile(){
-    int N=0;
-      ifstream input;
-      input.open("GraphVertexs.txt");
-      string s,splitter=" ";
-      while (getline(input,s)) {
-        int scr,des;
-        int index = s.find_first_of(splitter);
-        string Currentscr = s.substr(0,index);
-        string Currentdes = s.substr(index+1,s.length()-1);
-        stringstream stoi(Currentscr);
-        stoi >> scr;
-        stringstream stoi1(Currentdes);
-        stoi1 >> des;
-        Push_value(scr,des);
-      }
-  }
-  void print(){
-      unordered_map<int ,vector<int> >::iterator it;
-          for(it = Graph.begin() ; it != Graph.end() ;it++){
-              cout<<it->first<<":- ";
-                  for( int i = 0 ; i < it->second.size() ; i++){
-                          cout<<it->second[i]<<" ";
-                      }
-                      cout<<endl;
-          }
-  }
-  void DFS(int CurrentVertex){
-      vector<int>& CurrentVerticies = Graph[CurrentVertex];
-      vector<int>::iterator it;
-      visited.insert(CurrentVertex);
-      for(it = CurrentVerticies.begin() ; it != CurrentVerticies.end() ; it++){
-        if(visited.find(*it) == visited.end()){
-          DFS(*it);
-        }
-      }
-      cout<<CurrentVertex<<endl;
+  int coff;
+  int power;
+  list* next;
+list(int Coff,int Pow){
+    coff = Coff;
+    power = Pow;
+    next = NULL;
   }
 };
-int main(){
-  Graphs graph;
-  graph.ReadFile();
-  graph.print();
+class poly{
+private:
+  list* Head;
+  int len;
+public:
+  poly(){
+  }
+  void Add_Term(int C,int P){
+    cout<<"enter other term with power";
+    cin>>C>>P;
+    list* temp = Head;
+    while(temp->next != NULL){
+      temp= temp->next;
+    }
+    temp->next = new list(C,P);
+  }
+void Create_poly(int length){
+  len = length;
+  cout<<"enter first term with power";
+  int P,C;
+  cin>>C>>P;
+  Head = new list(C,P);
+  while(length > 1){
+    Add_Term(C,P);
+    length--;
+  }
+}
+void PrintIt(){
+  list* temp = Head;
+  while(temp != NULL){
+    cout<<temp->coff<<"^"<<temp->power<<" ";
+    temp=temp->next;
+  }
+}
+void Add(poly P1,poly P2){
+  int len1 = P1.len;
+  int len2 = P2.len;
+  list* Head1 = P1.Head;
+  list* Head2 = P2.Head;
   cout<<endl;
-  graph.DFS(1);
+  while(Head1 != NULL && Head2 != NULL){
+    if(Head1->power == Head2->power){
+      int sum = Head1->coff + Head2->coff;
+      cout<<sum<<"^"<<Head1->power<<" ";
+      Head1 = Head1->next;
+      Head2 = Head2->next;
+    }else if(Head1->power < Head2->power){
+      cout<<Head1->coff<<"^"<<Head1->power<<" ";
+      Head1 = Head1->next;
+     }else{
+      cout<<Head2->coff<<"^"<<Head2->power<<" ";
+      Head2 = Head2->next;
+    }
+  }
+  if(Head1 != NULL){
+    while(Head1 != NULL){
+      cout<<Head1->coff<<"^"<<Head1->power<<" ";
+      Head1 = Head1->next;
+    }
+    return;
+  }
+  if(Head2 != NULL){
+    while(Head2 != NULL){
+      cout<<Head2->coff<<"^"<<Head2->power<<" ";
+      Head2 = Head2->next;
+    }
+    return;
+  }
+}
+};
+int main(){
+  poly P1,P2,P;
+  P1.Create_poly(2);
+  P2.Create_poly(3);
+  P1.PrintIt();
+  cout<<endl;
+  P2.PrintIt();
+  P.Add(P1,P2);
 }
